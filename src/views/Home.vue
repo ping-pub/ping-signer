@@ -1,6 +1,6 @@
 <template>
   <div>
-    <t-input></t-input>
+    <div class="font-bold text-7xl text-green-500 justify-center items-center">hello</div>
   <ul class="divide-y divide-gray-200">
     <li v-for="person in people" :key="person.email" class="py-4 flex">
       <img class="h-10 w-10 rounded-full" :src="person.image" alt="" />
