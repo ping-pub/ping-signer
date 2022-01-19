@@ -2,7 +2,9 @@
   <Listbox v-model="selectedPerson">
     <ListboxButton>{{ selectedPerson.name }}</ListboxButton>
     <ListboxOptions>
-      <ListboxOption v-for="person in people" :key="person" :value="person">{{ person.name }}</ListboxOption>
+      <ListboxOption v-for="person in people" :key="person" :value="person">{{
+        person.name
+      }}</ListboxOption>
     </ListboxOptions>
   </Listbox>
 </template>
@@ -13,14 +15,14 @@ import {
   ListboxButton,
   ListboxOptions,
   ListboxOption,
-} from '@headlessui/vue'
+} from "@headlessui/vue";
 
 const people = [
-  { name: 'Durward Reynolds' },
-  { name: 'Kenton Towne' },
-  { name: 'Therese Wunsch' },
-  { name: 'Benedict Kessler' },
-  { name: 'Katelyn Rohan' },
+  { name: "Durward Reynolds" },
+  { name: "Kenton Towne" },
+  { name: "Therese Wunsch" },
+  { name: "Benedict Kessler" },
+  { name: "Katelyn Rohan" },
 ];
 
 export default {
@@ -28,8 +30,8 @@ export default {
   data() {
     return {
       people,
-      selectedPerson: people[1]
+      selectedPerson: people[1],
     };
-  }
-}
+  },
+};
 </script>

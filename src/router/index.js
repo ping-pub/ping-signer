@@ -5,7 +5,7 @@ import About from "@/views/About.vue";
 const routes = [
   {
     path: "/",
-    alias: '/popup',
+    alias: "/popup",
     name: "Home",
     component: Home,
   },
