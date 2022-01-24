@@ -5,7 +5,8 @@
   "description": "Ping Wallet is a well-known wallet in Cosmos Ecosystem",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "storage"
   ],
   "action": {
     "default_title": "Ping Key Manager",
@@ -13,10 +14,11 @@
     "default_popup": "index.html/#/"
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "web_accessible_resources": [{
-    "resources": [ "injected.js" ],
+    "resources": [ "injected.js", "logo.png" ],
     "matches": [ "<all_urls>" ]
   }],
   "content_scripts": [

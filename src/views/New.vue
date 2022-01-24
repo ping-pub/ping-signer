@@ -1,0 +1,243 @@
+<template>
+  <section v-if="step === 'confirm'" class="px-4 pt-4 pb-4 space-y-4">
+    <div>Select Your Mnemonic In Order:</div>
+    <div class="grid grid-cols-3 gap-1">
+      <input
+        v-for="(w, i) in confirms"
+        :key="i"
+        :placeholder="`${i + 1}`"
+        v-model="confirms[i]"
+        readonly
+        name="confirm"
+        :class="
+          confirms[i]
+            ? confirms[i] === words[i]
+              ? 'border-green-500'
+              : 'border-red-500'
+            : ''
+        "
+        class="border border-gray-200 w-24 px-1 text-center rounded"
+        @click="clear(i)"
+      />
+    </div>
+    <div class="grid grid-cols-3 gap-1 mt-2">
+      <input
+        v-for="w in wordsOptions"
+        name="confirm"
+        :key="w"
+        :value="w"
+        :disabled="disabled[w]"
+        readonly
+        :class="disabled[w] ? 'bg-red-50 text-white' : ''"
+        class="border border-gray-200 w-24 text-center rounded"
+        @click="select(w, this)"
+      />
+    </div>
+    <div class="flex justify-center">
+      <button
+        class="hover:bg-blue-400 group flex items-center rounded-md bg-blue-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
+        @click="save()"
+      >
+        Save
+      </button>
+    </div>
+  </section>
+  <section v-else class="px-4 pt-4 pb-4 space-y-4">
+    <div class="flex flex-row">
+      <RadioGroup v-model="length">
+        <!-- This Label is for the root `RadioGroup` -->
+        <div class="bg-white rounded-md flex flex-row">
+          <RadioGroupOption value="12" as="template" v-slot="{ checked }">
+            <div
+              :class="
+                checked ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200'
+              "
+              class="relative flex pl-7 pr-6 py-2 border"
+            >
+              <div class="flex flex-col">
+                <!-- This Label is for the `RadioGroupOption` -->
+                <RadioGroupLabel as="template">
+                  <span
+                    :class="checked ? 'text-indigo-900' : 'text-gray-900'"
+                    class="block text-sm font-medium"
+                    >12 Words</span
+                  >
+                </RadioGroupLabel>
+              </div>
+            </div>
+          </RadioGroupOption>
+          <RadioGroupOption value="18" as="template" v-slot="{ checked }">
+            <div
+              :class="
+                checked ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200'
+              "
+              class="relative flex px-6 py-2 border"
+            >
+              <div class="flex flex-col">
+                <!-- This Label is for the `RadioGroupOption` -->
+                <RadioGroupLabel as="template">
+                  <span
+                    :class="checked ? 'text-indigo-900' : 'text-gray-900'"
+                    class="block text-sm font-medium"
+                    >18 Words</span
+                  >
+                </RadioGroupLabel>
+              </div>
+            </div>
+          </RadioGroupOption>
+          <RadioGroupOption value="24" as="template" v-slot="{ checked }">
+            <div
+              :class="
+                checked ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200'
+              "
+              class="relative flex pl-6 pr-8 py-2 border"
+            >
+              <div class="flex flex-col">
+                <!-- This Label is for the `RadioGroupOption` -->
+                <RadioGroupLabel as="template">
+                  <span
+                    :class="checked ? 'text-indigo-900' : 'text-gray-900'"
+                    class="block text-sm font-medium"
+                    >24 Words</span
+                  >
+                </RadioGroupLabel>
+              </div>
+            </div>
+          </RadioGroupOption>
+        </div>
+      </RadioGroup>
+    </div>
+    <div>
+      <label
+        for="mnenonic"
+        class="text-sm font-medium text-gray-700 flex flex-row place-content-between"
+      >
+        <span>Mnemonic Seed</span>
+        <span class="hover:text-blue-400 text-blue-600" @click="generate()"
+          >Random Generate</span
+        >
+      </label>
+      <div class="mt-1">
+        <textarea
+          v-model="mnemonic"
+          id="mnenonic"
+          name="mnenonic"
+          rows="4"
+          class="focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-3"
+          placeholder="Input 12/18/24 words here"
+        />
+      </div>
+    </div>
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700">
+        Account Name
+      </label>
+      <div class="mt-1">
+        <input
+          v-model="name"
+          id="name"
+          name="name"
+          class="focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-3"
+          placeholder=""
+        />
+      </div>
+    </div>
+    <div class="text-red-500">{{ error }}</div>
+    <div class="flex justify-center">
+      <button
+        @click="parse()"
+        class="hover:bg-blue-400 group flex items-center rounded-md bg-blue-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
+      >
+        Next
+      </button>
+      <button
+        @click="save()"
+        class="hover:bg-blue-400 group flex items-center rounded-md bg-blue-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
+      >
+        Save
+      </button>
+    </div>
+  </section>
+</template>
+<script>
+import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
+import { generateMnemonic } from "bip39";
+import {
+  writeStore,
+  readStore,
+  getSessionKey,
+  setSessionKey,
+} from "../libs/utils";
+
+export default {
+  components: { RadioGroup, RadioGroupLabel, RadioGroupOption },
+
+  setup() {
+    return {};
+  },
+  data() {
+    return {
+      error: "",
+      step: "input",
+      length: "24",
+      mnemonic: "",
+      name: "",
+      confirms: [],
+      disabled: {},
+    };
+  },
+  computed: {
+    words() {
+      const words = this.mnemonic.split(" ").filter((x) => x !== "");
+      return words;
+    },
+    wordsOptions() {
+      const words = this.mnemonic.split(" ").filter((x) => x !== "");
+      return words.sort();
+    },
+  },
+  methods: {
+    generate() {
+      const strength =
+        this.length === "12" ? 128 : this.length === "18" ? 192 : 256;
+      this.mnemonic = generateMnemonic(strength);
+    },
+    select(v) {
+      this.disabled[v] = true;
+      const len = Number(this.length);
+      for (let i = 0; i < len; i++) {
+        if (!this.confirms[i]) {
+          this.confirms[i] = v;
+          return;
+        }
+      }
+    },
+    clear(i) {
+      const v = this.confirms[i];
+      if (v) {
+        this.disabled[v] = false;
+        this.confirms[i] = "";
+      }
+    },
+    save() {
+      setSessionKey("abc");
+      getSessionKey().then((x) => console.log("request from background:", x));
+
+      writeStore({ accounts: [this.mnemonic] });
+      readStore("accounts").then((a) => console.log("account", a));
+    },
+    parse() {
+      if (this.words.length === Number(this.length)) {
+        if (this.mnemonic && this.name) {
+          this.confirms = new Array(Number(this.length));
+          this.step = "confirm";
+        } else {
+          this.error = "All fields are required";
+        }
+      } else {
+        this.error = "Mnemonic is invalid";
+      }
+    },
+  },
+};
+</script>
