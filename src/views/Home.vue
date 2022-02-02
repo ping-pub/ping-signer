@@ -1,24 +1,22 @@
 <template>
   <section class="px-4 pt-4 pb-4 space-y-4">
     <ul class="grid grid-cols-1 gap-4">
-      <li v-for="p in people" :key="p.name">
+      <li v-for="(v, k) in accounts" :key="k">
         <a
           href="item.url"
           class="hover:bg-gray-200 hover:border-transparent hover:shadow-lg group block rounded-lg px-4 pt-2 border border-gray-200"
         >
           <dl class="grid grid-cols-2 grid-rows-2 items-center">
             <div>
-              <dt class="sr-only">Title</dt>
-              <dd class="leading-6 font-medium text-black">
-                {{ p.name }}
-              </dd>
+              <dt class="sr-only">Account Name</dt>
+              <dd class="leading-6 font-medium text-black">{{ k }}</dd>
             </div>
             <div>
-              <dt class="sr-only">Category</dt>
+              <dt class="sr-only">Address</dt>
               <dd class="text-sm text-gray-400 mb-4">m/60'/118/0'/0/0</dd>
             </div>
             <div class="col-start-2 row-start-1 row-end-3">
-              <dt class="sr-only">Users</dt>
+              <dt class="sr-only">Chains</dt>
               <dd
                 class="flex justify-end sm:justify-start lg:justify-end xl:justify-start -space-x-2"
               >
@@ -81,27 +79,26 @@
 </template>
 
 <script>
-const people = [
-  { name: "Durward Reynolds" },
-  { name: "Kenton Towne" },
-  { name: "Therese Wunsch" },
-  { name: "Katelyn Rohan" },
-];
-
+import { readAccounts } from "../libs/utils";
 export default {
   components: {},
   data() {
     return {
-      message: "",
-      people,
-      selectedPerson: people[1],
-      sessionkey: this.$store.state.sessionkey,
+      accounts: [],
     };
+  },
+  computed: {
+    sessionkey() {
+      return this.$store.state.sessionkey;
+    },
   },
   created() {
     if (!this.sessionkey) {
       this.$router.push({ name: "login" });
     }
+    readAccounts().then((a) => {
+      this.accounts = a;
+    });
   },
 };
 </script>

@@ -142,17 +142,35 @@
         />
       </div>
     </div>
+    <div>
+      <label
+        for="hdpath"
+        class="text-sm font-medium text-gray-700 flex flex-row place-content-between"
+      >
+        <span>HD Path</span>
+        <span @click="showChains()">cosmos</span>
+      </label>
+      <div class="mt-1">
+        <input
+          v-model="hdpath"
+          id="hdpath"
+          name="hdpath"
+          class="focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-3"
+          placeholder="m/44'/118/0'/0/0"
+        />
+      </div>
+    </div>
     <div class="text-red-500">{{ error }}</div>
     <div class="flex justify-center">
       <button
         @click="parse()"
-        class="hover:bg-blue-400 group flex items-center rounded-md bg-blue-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
+        class="hover:bg-indigo-400 group flex items-center rounded-md bg-indigo-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
       >
         Next
       </button>
       <button
         @click="save()"
-        class="hover:bg-blue-400 group flex items-center rounded-md bg-blue-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
+        class="hover:bg-indigo-400 group flex items-center rounded-md bg-indigo-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
       >
         Save
       </button>
@@ -162,12 +180,7 @@
 <script>
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
 import { generateMnemonic } from "bip39";
-import {
-  writeStore,
-  readStore,
-  getSessionKey,
-  setSessionKey,
-} from "../libs/utils";
+import { readAccounts, aesEncrypt, writeAccounts } from "../libs/utils";
 
 export default {
   components: { RadioGroup, RadioGroupLabel, RadioGroupOption },
@@ -177,6 +190,7 @@ export default {
   },
   data() {
     return {
+      hdpath: "m/44'/118/0'/0/0",
       error: "",
       step: "input",
       length: "24",
@@ -194,6 +208,9 @@ export default {
     wordsOptions() {
       const words = this.mnemonic.split(" ").filter((x) => x !== "");
       return words.sort();
+    },
+    sessionkey() {
+      return this.$store.state.sessionkey;
     },
   },
   methods: {
@@ -220,11 +237,13 @@ export default {
       }
     },
     save() {
-      setSessionKey("abc");
-      getSessionKey().then((x) => console.log("request from background:", x));
-
-      writeStore({ accounts: [this.mnemonic] });
-      readStore("accounts").then((a) => console.log("account", a));
+      readAccounts().then((a) => {
+        const accounts = a || {};
+        accounts[this.name] = {
+          mnemonic: aesEncrypt(this.mnemonic, this.sessionkey),
+        };
+        writeAccounts(accounts);
+      });
     },
     parse() {
       if (this.words.length === Number(this.length)) {

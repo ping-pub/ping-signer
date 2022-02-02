@@ -285,7 +285,7 @@ export default {
       if (this.remember) {
         setSessionKey(this.password);
       }
-      console.log("Session key changed:", this.$store.sessionkey);
+      console.log("Session key changed:", this.$store.state.sessionkey);
     },
   },
 };

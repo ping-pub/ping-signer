@@ -19,12 +19,20 @@ export async function readPassword(password) {
   return readStore("password").then((x) => aesDecrypt(x, password));
 }
 
-export async function removeAccounts() {
-  return removeStore("password").then(() => console.log("removed"));
-}
-
 export async function savePassword(value, password) {
   return writeStore({ password: aesEncrypt(value, password) });
+}
+
+export async function readAccounts() {
+  return readStore("accounts");
+}
+
+export async function writeAccounts(value) {
+  return writeStore({ accounts: value });
+}
+
+export async function removeAccounts() {
+  removeStore("password");
 }
 
 export async function getSessionKey() {
@@ -55,7 +63,7 @@ export async function writeStore(data) {
 
 export async function removeStore(key) {
   return new Promise(function (resolve) {
-    console.log("removing")
+    console.log("removing");
     chrome.storage.local.remove([key], resolve);
   });
 }
