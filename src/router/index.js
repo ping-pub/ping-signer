@@ -3,6 +3,7 @@ import Home from "@/views/Home.vue";
 import About from "@/views/About.vue";
 import New from "@/views/New.vue";
 import Login from "@/views/Login.vue";
+import Address from "@/views/Address.vue";
 
 const routes = [
   {
@@ -26,6 +27,11 @@ const routes = [
     alias: "/popup",
     name: "login",
     component: Login,
+  },
+  {
+    path: "/address",
+    name: "address",
+    component: Address,
   },
 ];
 

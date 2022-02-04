@@ -1,3 +1,7 @@
+import { stringToPath } from "@cosmjs/crypto";
+import { Secp256k1HdWallet } from "@cosmjs/amino";
+import { toHex } from "@cosmjs/encoding";
+
 const store_type = "store";
 const CryptoJS = require("crypto-js");
 
@@ -81,4 +85,21 @@ export async function readStore(key) {
     chrome.storage.local.get([key], (data) => resolve(data));
   });
   return result.then((x) => x[key]);
+}
+
+export async function createWallet(mnemonic, hdpath, prefix, name) {
+  const options = {
+    bip39Password: null,
+    hdPaths: [stringToPath(hdpath)],
+    prefix,
+  };
+  return await (await Secp256k1HdWallet.fromMnemonic(mnemonic, options))
+    .getAccounts()
+    .then((x) =>
+      x.map((v) => {
+        v.pubkey = toHex(v.pubkey);
+        v.name = name;
+        return v;
+      })
+    );
 }

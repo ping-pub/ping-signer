@@ -3,7 +3,7 @@
     <ul class="grid grid-cols-1 gap-4">
       <li v-for="(v, k) in accounts" :key="k">
         <a
-          href="item.url"
+          :href="`#address?account=${v.name}`"
           class="hover:bg-gray-200 hover:border-transparent hover:shadow-lg group block rounded-lg px-4 pt-2 border border-gray-200"
         >
           <dl class="grid grid-cols-2 grid-rows-2 items-center">
@@ -62,7 +62,6 @@ export default {
   methods: {
     showlogo(name) {
       const chain = this.$store.state.chains.find((x) => x.chain_name === name);
-      console.log("chain", chain, name);
       if (chain) {
         return chain.logo;
       }

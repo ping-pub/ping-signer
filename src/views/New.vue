@@ -35,6 +35,13 @@
     </div>
     <div class="flex justify-center">
       <button
+        v-if="!valid"
+        class="hover:bg-blue-400 group flex items-center rounded-md bg-blue-500 opacity-50 text-white text-sm font-medium px-10 py-4 shadow-sm"
+      >
+        Save
+      </button>
+      <button
+        v-else
         class="hover:bg-blue-400 group flex items-center rounded-md bg-blue-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
         @click="save()"
       >
@@ -125,6 +132,7 @@
           rows="4"
           class="focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-3"
           placeholder="Input 12/18/24 words here"
+          @change="onchange()"
         />
       </div>
     </div>
@@ -148,7 +156,7 @@
         class="text-sm font-medium text-gray-700 flex flex-row place-content-between"
       >
         <span>HD Path</span>
-        <span @click="showChains()">cosmos</span>
+        <span @click="showChains()"></span>
       </label>
       <div class="mt-1">
         <input
@@ -163,42 +171,28 @@
     <div class="text-red-500">{{ error }}</div>
     <div class="flex justify-center">
       <button
+        v-if="step === 'input'"
         @click="parse()"
-        class="hover:bg-indigo-400 group flex items-center rounded-md bg-indigo-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
+        class="hover:bg-indigo-400 group flex items-center rounded-md bg-indigo-500 text-white text-sm font-medium px-10 py-2 shadow-sm"
       >
         Next
       </button>
-      <button
-        @click="save()"
-        class="hover:bg-indigo-400 group flex items-center rounded-md bg-indigo-500 text-white text-sm font-medium px-10 py-4 shadow-sm"
-      >
-        Save
-      </button>
+      {{ length }}
     </div>
   </section>
 </template>
 <script>
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
 import { generateMnemonic } from "bip39";
-import {
-  // Bip39,
-  // Slip10,
-  // slip10CurveFromString,
-  // Secp256k1,
-  // sha256,
-  // ripemd160,
-  stringToPath,
-} from "@cosmjs/crypto";
-// import { Bech32, } from "@cosmjs/encoding";
-import { Secp256k1HdWallet } from "@cosmjs/amino";
+import { stringToPath } from "@cosmjs/crypto";
 import {
   readAccounts,
   aesEncrypt,
   writeAccounts,
   readCurrent,
   writeCurrent,
+  createWallet,
 } from "../libs/utils";
-import { toHex } from '@cosmjs/encoding';
 
 export default {
   components: { RadioGroup, RadioGroupLabel, RadioGroupOption },
@@ -220,21 +214,38 @@ export default {
   },
   computed: {
     words() {
-      const words = this.mnemonic.split(" ").filter((x) => x !== "");
+      const words = this.mnemonic
+        .trim()
+        .split(" ")
+        .filter((x) => x !== "");
       return words;
     },
     wordsOptions() {
-      const words = this.mnemonic.split(" ").filter((x) => x !== "");
+      const words = this.mnemonic
+        .trim()
+        .split(" ")
+        .filter((x) => x !== "");
       return words.sort();
     },
     sessionkey() {
       return this.$store.state.sessionkey;
     },
-  },
-  created() {
-    console.log("Chain:", this.$store.state.chains);
+    valid() {
+      let valid = true;
+      this.words.forEach((x, i) => {
+        if (x !== this.confirms[i]) {
+          valid = false;
+        }
+      });
+      return valid;
+    },
   },
   methods: {
+    onchange() {
+      this.mnemonic = this.mnemonic.trim();
+      if ([12, 18, 24].includes(this.words.length))
+        this.length = String(this.words.length);
+    },
     generate() {
       const strength =
         this.length === "12" ? 128 : this.length === "18" ? 192 : 256;
@@ -257,25 +268,8 @@ export default {
         this.confirms[i] = "";
       }
     },
-    async createWallet(prefix, name) {
-      const options = {
-        bip39Password: null,
-        hdPaths: [stringToPath(this.hdpath)],
-        prefix,
-      };
-      return await (
-        await Secp256k1HdWallet.fromMnemonic(this.mnemonic, options)
-      )
-        .getAccounts()
-        .then((x) =>
-          x.map((v) => {
-            v.pubkey = toHex(v.pubkey);
-            v.name = name;
-            return v;
-          })
-        );
-    },
-    async save() {
+
+    save() {
       readAccounts().then((a) => {
         const hdpath = stringToPath(this.hdpath);
         const addresses = this.$store.state.chains
@@ -284,7 +278,12 @@ export default {
             return hdpath[1].toNumber() === hd2[1].toNumber();
           })
           .map((chain) =>
-            this.createWallet(chain.addr_prefix, chain.chain_name)
+            createWallet(
+              this.mnemonic,
+              this.hdpath,
+              chain.addr_prefix,
+              chain.chain_name
+            )
           );
 
         Promise.all(addresses).then((x) => {
@@ -301,6 +300,7 @@ export default {
               writeCurrent(this.name);
             }
           });
+          this.$router.push("/home");
         });
       });
     },
