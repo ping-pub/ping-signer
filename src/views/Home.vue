@@ -9,11 +9,11 @@
           <dl class="grid grid-cols-2 grid-rows-2 items-center">
             <div>
               <dt class="sr-only">Account Name</dt>
-              <dd class="leading-6 font-medium text-black">{{ k }}</dd>
+              <dd class="leading-6 font-medium text-black">{{ v.name }}</dd>
             </div>
             <div>
               <dt class="sr-only">Address</dt>
-              <dd class="text-sm text-gray-400 mb-4">m/60'/118/0'/0/0</dd>
+              <dd class="text-xs text-gray-400 mb-4">{{ v.hdpath }}</dd>
             </div>
             <div class="col-start-2 row-start-1 row-end-3">
               <dt class="sr-only">Chains</dt>
@@ -21,42 +21,9 @@
                 class="flex justify-end sm:justify-start lg:justify-end xl:justify-start -space-x-2"
               >
                 <img
-                  src="https://dl.airtable.com/.attachments/f25737491bd0034240093a7b4e039b15/afec77ff/logo.png"
-                  width="48"
-                  height="48"
-                  class="w-7 h-7 rounded-full bg-gray-100 border-2 border-white"
-                />
-
-                <img
-                  src="https://dl.airtable.com/.attachments/e54f814bba8c0f9af8a3056020210de0/2d1155fb/cosmos-hub.svg"
-                  width="48"
-                  height="48"
-                  class="w-7 h-7 rounded-full bg-gray-100 border-2 border-white"
-                />
-
-                <img
-                  src="https://dl.airtable.com/.attachments/e54f814bba8c0f9af8a3056020210de0/2d1155fb/cosmos-hub.svg"
-                  width="48"
-                  height="48"
-                  class="w-7 h-7 rounded-full bg-gray-100 border-2 border-white"
-                />
-
-                <img
-                  src="https://dl.airtable.com/.attachments/e54f814bba8c0f9af8a3056020210de0/2d1155fb/cosmos-hub.svg"
-                  width="48"
-                  height="48"
-                  class="w-7 h-7 rounded-full bg-gray-100 border-2 border-white"
-                />
-
-                <img
-                  src="https://dl.airtable.com/.attachments/f25737491bd0034240093a7b4e039b15/afec77ff/logo.png"
-                  width="48"
-                  height="48"
-                  class="w-7 h-7 rounded-full bg-gray-100 border-2 border-white"
-                />
-
-                <img
-                  src="https://dl.airtable.com/.attachments/e54f814bba8c0f9af8a3056020210de0/2d1155fb/cosmos-hub.svg"
+                  v-for="logo in v.logos"
+                  :key="logo"
+                  :src="logo"
                   width="48"
                   height="48"
                   class="w-7 h-7 rounded-full bg-gray-100 border-2 border-white"
@@ -92,12 +59,37 @@ export default {
       return this.$store.state.sessionkey;
     },
   },
+  methods: {
+    showlogo(name) {
+      const chain = this.$store.state.chains.find((x) => x.chain_name === name);
+      console.log("chain", chain, name);
+      if (chain) {
+        return chain.logo;
+      }
+      return "";
+    },
+  },
   created() {
-    if (!this.sessionkey) {
-      this.$router.push({ name: "login" });
-    }
     readAccounts().then((a) => {
-      this.accounts = a;
+      console.log(a);
+      this.accounts = Object.keys(a).map((k) => {
+        const v = a[k];
+
+        const addresses = v.addresses || [];
+        const logos = addresses
+          .map((addr) => this.showlogo(addr.name))
+          .filter(
+            (i) =>
+              i.startsWith("https://dl.airtable.com") ||
+              i.startsWith("https://ping.pub")
+          )
+          .slice(0, 8);
+        return {
+          name: k,
+          hdpath: v.hdpath,
+          logos,
+        };
+      });
     });
   },
 };

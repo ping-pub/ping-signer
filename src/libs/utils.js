@@ -23,6 +23,14 @@ export async function savePassword(value, password) {
   return writeStore({ password: aesEncrypt(value, password) });
 }
 
+export async function readCurrent() {
+  return readStore("current");
+}
+
+export async function writeCurrent(value) {
+  return writeStore({ current: value });
+}
+
 export async function readAccounts() {
   return readStore("accounts");
 }

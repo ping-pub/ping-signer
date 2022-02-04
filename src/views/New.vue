@@ -180,7 +180,25 @@
 <script>
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
 import { generateMnemonic } from "bip39";
-import { readAccounts, aesEncrypt, writeAccounts } from "../libs/utils";
+import {
+  // Bip39,
+  // Slip10,
+  // slip10CurveFromString,
+  // Secp256k1,
+  // sha256,
+  // ripemd160,
+  stringToPath,
+} from "@cosmjs/crypto";
+// import { Bech32, } from "@cosmjs/encoding";
+import { Secp256k1HdWallet } from "@cosmjs/amino";
+import {
+  readAccounts,
+  aesEncrypt,
+  writeAccounts,
+  readCurrent,
+  writeCurrent,
+} from "../libs/utils";
+import { toHex } from '@cosmjs/encoding';
 
 export default {
   components: { RadioGroup, RadioGroupLabel, RadioGroupOption },
@@ -190,7 +208,7 @@ export default {
   },
   data() {
     return {
-      hdpath: "m/44'/118/0'/0/0",
+      hdpath: "m/44'/118'/0'/0/0",
       error: "",
       step: "input",
       length: "24",
@@ -212,6 +230,9 @@ export default {
     sessionkey() {
       return this.$store.state.sessionkey;
     },
+  },
+  created() {
+    console.log("Chain:", this.$store.state.chains);
   },
   methods: {
     generate() {
@@ -236,13 +257,51 @@ export default {
         this.confirms[i] = "";
       }
     },
-    save() {
+    async createWallet(prefix, name) {
+      const options = {
+        bip39Password: null,
+        hdPaths: [stringToPath(this.hdpath)],
+        prefix,
+      };
+      return await (
+        await Secp256k1HdWallet.fromMnemonic(this.mnemonic, options)
+      )
+        .getAccounts()
+        .then((x) =>
+          x.map((v) => {
+            v.pubkey = toHex(v.pubkey);
+            v.name = name;
+            return v;
+          })
+        );
+    },
+    async save() {
       readAccounts().then((a) => {
-        const accounts = a || {};
-        accounts[this.name] = {
-          mnemonic: aesEncrypt(this.mnemonic, this.sessionkey),
-        };
-        writeAccounts(accounts);
+        const hdpath = stringToPath(this.hdpath);
+        const addresses = this.$store.state.chains
+          .filter((chain) => {
+            const hd2 = stringToPath(`m/44'/${chain.coin_type}'/0'/0/0`);
+            return hdpath[1].toNumber() === hd2[1].toNumber();
+          })
+          .map((chain) =>
+            this.createWallet(chain.addr_prefix, chain.chain_name)
+          );
+
+        Promise.all(addresses).then((x) => {
+          const accounts = a || {};
+          accounts[this.name] = {
+            mnemonic: aesEncrypt(this.mnemonic, this.sessionkey),
+            hdpath: this.hdpath,
+            addresses: x.flat(),
+          };
+          console.log(accounts);
+          writeAccounts(accounts);
+          readCurrent().then((x) => {
+            if (!x) {
+              writeCurrent(this.name);
+            }
+          });
+        });
       });
     },
     parse() {

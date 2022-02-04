@@ -5,9 +5,9 @@ const loader = require.context(
   false,
   /\.json$/
 );
-console.log(loader);
+const chains = [];
 loader.keys().forEach((k) => {
-  console.log(k, loader(k));
+  chains.push(loader(k));
 });
 
 // Create a new store instance.
@@ -15,6 +15,7 @@ const store = createStore({
   state: {
     count: 0,
     sessionkey: "",
+    chains,
   },
   getters: {
     key: (state) => {
