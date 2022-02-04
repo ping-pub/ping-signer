@@ -156,7 +156,7 @@
           id="hdpath"
           name="hdpath"
           class="focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-3"
-          placeholder="m/44'/118/0'/0/0"
+          placeholder="m/44'/118'/0'/0/0"
         />
       </div>
     </div>
