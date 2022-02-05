@@ -177,7 +177,6 @@
       >
         Next
       </button>
-      {{ length }}
     </div>
   </section>
 </template>

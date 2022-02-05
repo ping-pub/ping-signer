@@ -69,6 +69,10 @@ export default {
     },
   },
   created() {
+    if (!this.sessionkey) {
+      this.$router.push("/login");
+      return;
+    }
     readAccounts().then((a) => {
       console.log(a);
       this.accounts = Object.keys(a).map((k) => {

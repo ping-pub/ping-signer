@@ -2,7 +2,7 @@ import { stringToPath } from "@cosmjs/crypto";
 import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { toHex } from "@cosmjs/encoding";
 
-const store_type = "store";
+const store_type = "page"; // store or page
 const CryptoJS = require("crypto-js");
 
 export function aesEncrypt(txt, password) {
@@ -45,6 +45,7 @@ export async function writeAccounts(value) {
 
 export async function removeAccounts() {
   removeStore("password");
+  removeStore("accounts");
 }
 
 export async function getSessionKey() {
