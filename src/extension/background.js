@@ -2,6 +2,10 @@ let sessionkey = "";
 
 chrome.runtime.onMessage.addListener((msg, _, responseCall) => {
   switch (msg.event) {
+    case "hello":
+      console.log("hello");
+      responseCall(msg.input);
+      break;
     case "GetSessionKey":
       responseCall(sessionkey);
       break;
