@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { stringToPath } from "@cosmjs/crypto";
 import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { toHex } from "@cosmjs/encoding";
@@ -13,6 +14,10 @@ export function aesDecrypt(text, password) {
   // Decrypt
   var bytes = CryptoJS.AES.decrypt(text, password);
   return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+export async function readSignInput() {
+  return readStore("input");
 }
 
 export async function readDecryptPassword() {

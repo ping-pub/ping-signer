@@ -1,4 +1,9 @@
-import { readAccounts } from "../libs/utils.js";
+/* eslint-disable no-undef */
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log("forword:", request);
+  response(request);
+  sendResponse("message forwarded");
+});
 
 document.addEventListener("DOMContentLoaded", function () {
   // console.log("我被执行了！");
@@ -15,24 +20,45 @@ document.addEventListener("DOMContentLoaded", function () {
 window.addEventListener(
   "message",
   (event) => {
+    if (event.data.target) return;
     // We only accept messages from ourselves
     if (event.source != window) {
       return;
     }
 
     if (event.data.type && event.data.type.startsWith("ping-wallet")) {
-      console.log(`${event.data.type}'s Content received ${event.data.args}`);
+      console.log(`${event.data.type}'s Content received`, event.data.args);
       switch (event.data.type) {
         case "ping-wallet-getChains":
           getchains();
           break;
         case "ping-wallet-getAccounts":
+          getAccounts(event.data.args[0]);
+          break;
+        case "ping-wallet-signDirect":
+          signDirect(event.data.args);
+          break;
+        case "ping-wallet-signAmino":
+          signAmino(event.data.args);
           break;
       }
     }
   },
   false
 );
+
+async function readStore(key) {
+  const result = new Promise(function (resolve) {
+    chrome.storage.local.get([key], (data) => resolve(data));
+  });
+  return result.then((x) => x[key]);
+}
+
+async function writeStore(data) {
+  return new Promise(function (resolve) {
+    chrome.storage.local.set({ input: data }, resolve);
+  });
+}
 
 function response(data) {
   window.postMessage(
@@ -45,7 +71,61 @@ function response(data) {
 }
 
 function getchains() {
-  readAccounts().then((data) => {
-    response(data);
+  readStore("accounts").then((data) => {
+    if (data) {
+      readStore("current").then((current) => {
+        const selected = current || Object.keys(data)[0];
+        const chains = [];
+        const accounts = data[selected];
+        if (accounts) {
+          accounts.addresses.forEach((element) => {
+            chains.push(element.name);
+          });
+        }
+        response(chains);
+      });
+    } else {
+      response([]);
+    }
+  });
+}
+
+function getAccounts(chainName) {
+  readStore("accounts").then((data) => {
+    if (data) {
+      readStore("current").then((current) => {
+        const selected = current || Object.keys(data)[0];
+        const chains = [];
+        const accounts = data[selected];
+        console.log(data, accounts, chainName);
+        if (accounts) {
+          accounts.addresses
+            .filter((x) => x.name === chainName)
+            .forEach((element) => {
+              chains.push(element);
+            });
+        }
+        response(chains);
+      });
+    } else {
+      response([]);
+    }
+  });
+}
+
+function signDirect(input) {
+  writeStore(input).then(() => {
+    chrome.runtime.sendMessage({ event: "signDirect", input }, (ret) => {
+      console.log("window callback:", ret);
+    });
+  });
+}
+
+//function signAmino({ address, signDoc }) {
+function signAmino(input) {
+  writeStore(input).then(() => {
+    chrome.runtime.sendMessage({ event: "signAmino", input }, (ret) => {
+      console.log("window callback:", ret);
+    });
   });
 }

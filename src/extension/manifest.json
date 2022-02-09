@@ -4,6 +4,7 @@
   "version": "0.1",
   "description": "Ping Wallet is a well-known wallet in Cosmos Ecosystem",
   "permissions": [
+    "tabs",
     "activeTab",
     "scripting",
     "storage"

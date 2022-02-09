@@ -1,13 +1,14 @@
 class PingSigner {
-  constructor(chainName) {
-    this.chainName = chainName;
-  }
   async getChains() {
     return this.request("getChains");
   }
 
+  async enable(chainName) {
+    this.chainName = chainName;
+  }
+
   async getAccounts() {
-    return this.request("getAccounts", this.chainName);
+    return this.request("getAccounts", [this.chainName]);
   }
 
   async sign(address, signDoc) {
@@ -15,11 +16,11 @@ class PingSigner {
   }
 
   async signDirect(address, signDoc) {
-    return this.request("signDirect", [address, signDoc]);
+    return this.request("signDirect", { address, signDoc });
   }
 
   async signAmino(address, signDoc) {
-    return this.request("signAmino", [address, signDoc]);
+    return this.request("signAmino", { address, signDoc });
   }
 
   async request(method, args = null) {
@@ -60,13 +61,14 @@ class PingSigner {
 }
 
 window.PingSigner = new PingSigner();
-window.PingSigner.getChains().then((data) => {
+window.PingSigner.enable("cosmos");
+window.PingSigner.getAccounts().then((data) => {
   console.log("request done:", data);
 });
 setTimeout(() => {
-  window.PingSigner.request("opq", "text from webpage.").then((data) => {
+  window.PingSigner.signAmino("address", { a: "a", b: "b" }).then((data) => {
     console.log("request done:", data);
   });
-}, 3000);
+}, 1000);
 
 console.log("injected is invorked.");

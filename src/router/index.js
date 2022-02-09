@@ -4,6 +4,7 @@ import About from "@/views/About.vue";
 import New from "@/views/New.vue";
 import Login from "@/views/Login.vue";
 import Address from "@/views/Address.vue";
+import Sign from "@/views/Sign.vue";
 
 const routes = [
   {
@@ -32,6 +33,11 @@ const routes = [
     path: "/address",
     name: "address",
     component: Address,
+  },
+  {
+    path: "/sign",
+    name: "sign",
+    component: Sign,
   },
 ];
 
