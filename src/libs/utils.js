@@ -93,7 +93,7 @@ export async function readStore(key) {
   return result.then((x) => x[key]);
 }
 
-export async function createWallet(mnemonic, hdpath, prefix, name) {
+export async function createAccounts(mnemonic, hdpath, prefix, name) {
   const options = {
     bip39Password: null,
     hdPaths: [stringToPath(hdpath)],
@@ -108,4 +108,22 @@ export async function createWallet(mnemonic, hdpath, prefix, name) {
         return v;
       })
     );
+}
+
+export async function signAmino(signerAddress, signDoc, password = "") {
+  return readAccounts().then((accounts) => {
+    const acc = Object.values(accounts).find(
+      (acc) =>
+        acc.addresses.findIndex((i) => i.address === signerAddress) !== -1
+    );
+    const mnemonic = aesDecrypt(acc.mnemonic, password);
+    const options = {
+      bip39Password: null,
+      hdPaths: [stringToPath(acc.hdpath)],
+      prefix: signerAddress.substring(0, signerAddress.indexOf("1")),
+    };
+    return Secp256k1HdWallet.fromMnemonic(mnemonic, options).then((wallet) => {
+      return wallet.signAmino(signerAddress, signDoc);
+    });
+  });
 }

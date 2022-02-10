@@ -45,7 +45,7 @@ class PingSigner {
           return;
         }
 
-        resolve(result);
+        resolve(result.body);
       };
 
       window.addEventListener("message", responseCall);
@@ -61,12 +61,15 @@ class PingSigner {
 }
 
 window.PingSigner = new PingSigner();
-window.PingSigner.enable("cosmos");
+window.PingSigner.enable("akash-network");
 window.PingSigner.getAccounts().then((data) => {
   console.log("request done:", data);
 });
 setTimeout(() => {
-  window.PingSigner.signAmino("address", { a: "a", b: "b" }).then((data) => {
+  window.PingSigner.signAmino("akash1lp9rqcezrmtp0h75s464h6urn7jgj64heang8l", {
+    a: "a",
+    b: "b",
+  }).then((data) => {
     console.log("request done:", data);
   });
 }, 1000);

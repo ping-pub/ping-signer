@@ -190,7 +190,7 @@ import {
   writeAccounts,
   readCurrent,
   writeCurrent,
-  createWallet,
+  createAccounts,
 } from "../libs/utils";
 
 export default {
@@ -277,7 +277,7 @@ export default {
             return hdpath[1].toNumber() === hd2[1].toNumber();
           })
           .map((chain) =>
-            createWallet(
+            createAccounts(
               this.mnemonic,
               this.hdpath,
               chain.addr_prefix,

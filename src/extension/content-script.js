@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log("forword:", request);
   response(request);
   sendResponse("message forwarded");
 });

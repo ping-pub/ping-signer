@@ -1,15 +1,6 @@
 /* eslint-disable no-undef */
 let sessionkey = "";
 
-// var port = chrome.runtime.connect({ name: "knockknock" });
-// port.onMessage.addListener(function (msg) {
-//   console.log("port msg in background:", msg);
-//   if (msg.question === "Who's there?") port.postMessage({ answer: "Madame" });
-//   else if (msg.question === "Madame who?")
-//     port.postMessage({ answer: "Madame... Bovary" });
-// });
-// port.postMessage({ joke: "Knock knock" });
-
 chrome.runtime.onMessage.addListener((msg, _, responseCall) => {
   console.log("background:", msg);
   switch (msg.event) {
@@ -26,12 +17,12 @@ chrome.runtime.onMessage.addListener((msg, _, responseCall) => {
       break;
     }
     case "approve": {
-      sendMessageToContent(msg);
+      sendMessageToContent(msg.input);
       responseCall();
       break;
     }
     case "reject": {
-      sendMessageToContent(msg);
+      sendMessageToContent(msg.input);
       responseCall();
       break;
     }
