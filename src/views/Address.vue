@@ -75,6 +75,8 @@ export default {
       return this.$store.state.sessionkey;
     },
     derived() {
+      if (!this.hdpath || !this.hdpath.startsWith("m")) return [];
+
       const coin_type = stringToPath(this.hdpath)[1].toNumber();
       const addresses = this.addresses.map((a) => {
         const a2 = a;
@@ -111,13 +113,14 @@ export default {
     },
   },
   created() {
+    console.log("start");
     this.account = this.$route.query.account;
     readAccounts().then((a) => {
       const acc = a[this.account];
       this.hdpath = acc.hdpath;
       this.selected = acc.addresses.map((x) => x.name);
       this.mnemonic = aesDecrypt(acc.mnemonic, this.sessionkey);
-
+      console.log("hdpath:", this.hdpath);
       const wallet = this.$store.state.chains.map((x) =>
         createAccounts(this.mnemonic, this.hdpath, x.addr_prefix, x.chain_name)
       );

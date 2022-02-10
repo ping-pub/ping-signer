@@ -86,9 +86,8 @@
                 aria-hidden="true"
               />
             </span>
-            Sign {{ `${sessionkey ? "In" : "Up"}` }}
+            Sign {{ `${registered ? "In" : "Up"}` }}
           </button>
-          -{{ rawkey }}-
         </div>
       </form>
     </div>
@@ -232,7 +231,6 @@ export default {
     // setSessionKey("set session");
     // Remember, auto login
     getSessionKey().then((x) => {
-      console.log("getsession:", x);
       if (x) {
         this.password = String(x);
         this.login();
