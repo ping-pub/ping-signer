@@ -8,7 +8,12 @@ class PingSigner {
   }
 
   async getAccounts() {
-    return this.request("getAccounts", [this.chainName]);
+    return this.request("getAccounts", [this.chainName]).then((accounts) =>
+      accounts.map((i) => {
+        i.pubkey = this.hexToBytes(i.pubkey);
+        return i;
+      })
+    );
   }
 
   async sign(address, signDoc) {
@@ -57,6 +62,12 @@ class PingSigner {
         "*"
       );
     });
+  }
+
+  hexToBytes(hex) {
+    for (var bytes = [], c = 0; c < hex.length; c += 2)
+      bytes.push(parseInt(hex.substr(c, 2), 16));
+    return bytes;
   }
 }
 
