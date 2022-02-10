@@ -88,7 +88,7 @@ export default {
         readPassword(this.password)
           .then((p) => {
             if (p === this.password) {
-              signAmino(this.address, this.signDoc, p)
+              signAmino(this.address, this.input.signDoc, p)
                 .then((res) => {
                   internRequest("approve", res).then(() => {
                     window.close();
