@@ -118,7 +118,6 @@ export async function signAmino(signerAddress, signDoc, password = "") {
         acc.addresses.findIndex((i) => i.address === signerAddress) !== -1
     );
 
-    console.log(accounts, acc, signerAddress, password);
     if (!acc) throw new Error("No Account found");
     const mnemonic = aesDecrypt(acc.mnemonic, password);
     const options = {
