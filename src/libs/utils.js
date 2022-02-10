@@ -112,10 +112,14 @@ export async function createAccounts(mnemonic, hdpath, prefix, name) {
 
 export async function signAmino(signerAddress, signDoc, password = "") {
   return readAccounts().then((accounts) => {
+    if (!accounts) throw new Error("No Account found");
     const acc = Object.values(accounts).find(
       (acc) =>
         acc.addresses.findIndex((i) => i.address === signerAddress) !== -1
     );
+
+    console.log(accounts, acc, signerAddress, password);
+    if (!acc) throw new Error("No Account found");
     const mnemonic = aesDecrypt(acc.mnemonic, password);
     const options = {
       bip39Password: null,

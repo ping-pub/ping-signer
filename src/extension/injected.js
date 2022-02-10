@@ -66,7 +66,7 @@ window.PingSigner.getAccounts().then((data) => {
   console.log("request done:", data);
 });
 setTimeout(() => {
-  window.PingSigner.signAmino("akash1lp9rqcezrmtp0h75s464h6urn7jgj64heang8l", {
+  window.PingSigner.signAmino("akash1m8mma95ta2zajqtmfp5c5y3wgeyqzcrcn3astm", {
     a: "a",
     b: "b",
   }).then((data) => {

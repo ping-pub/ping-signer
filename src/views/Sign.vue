@@ -79,19 +79,30 @@ import {
 
 export default {
   methods: {
+    showerror(error) {
+      this.error = error;
+      setTimeout(() => (this.error = ""), 5000);
+    },
     sign() {
-      readPassword(this.password).then((p) => {
-        if (p === this.password) {
-          signAmino(this.address, this.signDoc, p).then((res) => {
-            internRequest("approve", res).then(() => {
-              window.close();
-            });
-          });
-        } else {
-          this.error = "password is incorrect";
-          setTimeout(() => (this.error = ""), 5000);
-        }
-      });
+      if (this.password) {
+        readPassword(this.password)
+          .then((p) => {
+            if (p === this.password) {
+              signAmino(this.address, this.signDoc, p)
+                .then((res) => {
+                  internRequest("approve", res).then(() => {
+                    window.close();
+                  });
+                })
+                .catch(() => this.showerror("No account exists!"));
+            } else {
+              this.showerror("Password is incorrect!");
+            }
+          })
+          .catch(() => this.showerror("No account exists!"));
+      } else {
+        this.showerror("Password is required!");
+      }
     },
     reject() {
       internRequest("reject", { error: "Rejected" }).then(() => {
