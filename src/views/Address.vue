@@ -55,7 +55,7 @@
 import { stringToPath } from "@cosmjs/crypto";
 import {
   aesDecrypt,
-  createWallet,
+  createAccounts,
   readAccounts,
   writeAccounts,
 } from "../libs/utils";
@@ -106,7 +106,6 @@ export default {
         accounts[this.account].addresses = this.addresses.filter((x) =>
           this.selected.includes(x.name)
         );
-        console.log("account:", accounts);
         writeAccounts(accounts).then(() => this.$router.push("/home"));
       });
     },
@@ -120,7 +119,7 @@ export default {
       this.mnemonic = aesDecrypt(acc.mnemonic, this.sessionkey);
 
       const wallet = this.$store.state.chains.map((x) =>
-        createWallet(this.mnemonic, this.hdpath, x.addr_prefix, x.chain_name)
+        createAccounts(this.mnemonic, this.hdpath, x.addr_prefix, x.chain_name)
       );
       const promise = Promise.all(wallet);
       promise.then((x) => (this.addresses = x.flat()));
