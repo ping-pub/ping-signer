@@ -17,6 +17,8 @@ jobs:
       run: echo ${GITHUB_REF#refs/heads/}
     - name: Git Checkout Latest
       uses: actions/checkout@v2
+      with:
+        submodules: 'true'
       
     - name: Install
       run: yarn install
