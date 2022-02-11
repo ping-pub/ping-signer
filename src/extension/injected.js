@@ -72,17 +72,3 @@ class PingSigner {
 }
 
 window.PingSigner = new PingSigner();
-window.PingSigner.enable("akash-network");
-window.PingSigner.getAccounts().then((data) => {
-  console.log("request done:", data);
-});
-setTimeout(() => {
-  window.PingSigner.signAmino("akash1m8mma95ta2zajqtmfp5c5y3wgeyqzcrcn3astm", {
-    a: "a",
-    b: "b",
-  }).then((data) => {
-    console.log("request done:", data);
-  });
-}, 1000);
-
-console.log("injected is invorked.");

@@ -26,7 +26,6 @@ window.addEventListener(
     }
 
     if (event.data.type && event.data.type.startsWith("ping-wallet")) {
-      console.log(`${event.data.type}'s Content received`, event.data.args);
       switch (event.data.type) {
         case "ping-wallet-getChains":
           getchains();
