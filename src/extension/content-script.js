@@ -96,13 +96,18 @@ function getAccounts(chainName) {
         const selected = current || Object.keys(data)[0];
         const chains = [];
         const accounts = data[selected];
-        console.log(data, accounts, chainName);
         if (accounts) {
-          accounts.addresses
-            .filter((x) => x.name === chainName)
-            .forEach((element) => {
+          if (chainName) {
+            accounts.addresses
+              .filter((x) => x.name === chainName)
+              .forEach((element) => {
+                chains.push(element);
+              });
+          } else {
+            accounts.addresses.forEach((element) => {
               chains.push(element);
             });
+          }
         }
         response(chains);
       });
