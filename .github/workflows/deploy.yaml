@@ -3,7 +3,8 @@ name: Deploy And Publish
 
 on:
   push:
-    tags: *
+    tags: 
+      - *
   # pull_request:
   #   branches: [ master ]
 
