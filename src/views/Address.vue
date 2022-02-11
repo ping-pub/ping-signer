@@ -1,6 +1,8 @@
 <template>
-  <section class="px-4 pt-4 pb-4 space-y-4">
-    {{ account }} - <small>{{ hdpath }}</small>
+  <section class="px-4 pt-4 pb-4 space-y-4 text-md">
+    <input type="checkbox" v-model="defaultAccount" @change="change()" />
+    {{ account }} -
+    <small>{{ hdpath }}</small>
     <ul class="grid grid-cols-1 gap-2">
       <li v-for="(v, k) in derived" :key="k">
         <div class="relative rounded-md shadow-sm">
@@ -57,7 +59,9 @@ import {
   aesDecrypt,
   createAccounts,
   readAccounts,
+  readCurrent,
   writeAccounts,
+  writeCurrent,
 } from "../libs/utils";
 export default {
   components: {},
@@ -68,6 +72,7 @@ export default {
       addresses: [],
       selected: [],
       toSave: [],
+      defaultAccount: "",
     };
   },
   computed: {
@@ -99,6 +104,9 @@ export default {
     },
   },
   methods: {
+    change() {
+      writeCurrent(this.account);
+    },
     back() {
       this.$router.push("/home");
     },
@@ -113,8 +121,10 @@ export default {
     },
   },
   created() {
-    console.log("start");
     this.account = this.$route.query.account;
+    readCurrent().then((c) => {
+      this.defaultAccount = c === this.account;
+    });
     readAccounts().then((a) => {
       const acc = a[this.account];
       this.hdpath = acc.hdpath;

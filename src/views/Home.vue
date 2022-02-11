@@ -9,7 +9,13 @@
           <dl class="grid grid-cols-2 grid-rows-2 items-center">
             <div>
               <dt class="sr-only">Account Name</dt>
-              <dd class="leading-6 font-medium text-black">{{ v.name }}</dd>
+              <dd class="text-md font-medium text-black flex flex-row">
+                {{ v.name }}
+                <BadgeCheckIcon
+                  v-if="v.name === defaultAccount"
+                  class="w-4 h-4 text-blue-500"
+                />
+              </dd>
             </div>
             <div>
               <dt class="sr-only">Address</dt>
@@ -46,11 +52,15 @@
 </template>
 
 <script>
-import { readAccounts } from "../libs/utils";
+import { readAccounts, readCurrent } from "../libs/utils";
+import { BadgeCheckIcon } from "@heroicons/vue/solid";
 export default {
-  components: {},
+  components: {
+    BadgeCheckIcon,
+  },
   data() {
     return {
+      defaultAccount: "",
       accounts: [],
     };
   },
@@ -73,26 +83,30 @@ export default {
       this.$router.push("/login");
       return;
     }
+    readCurrent().then((c) => {
+      this.defaultAccount = c || "";
+    });
     readAccounts().then((a) => {
-      console.log(a);
-      this.accounts = Object.keys(a).map((k) => {
-        const v = a[k];
+      if (a) {
+        this.accounts = Object.keys(a).map((k) => {
+          const v = a[k];
 
-        const addresses = v.addresses || [];
-        const logos = addresses
-          .map((addr) => this.showlogo(addr.name))
-          .filter(
-            (i) =>
-              i.startsWith("https://dl.airtable.com") ||
-              i.startsWith("https://ping.pub")
-          )
-          .slice(0, 8);
-        return {
-          name: k,
-          hdpath: v.hdpath,
-          logos,
-        };
-      });
+          const addresses = v.addresses || [];
+          const logos = addresses
+            .map((addr) => this.showlogo(addr.name))
+            .filter(
+              (i) =>
+                i.startsWith("https://dl.airtable.com") ||
+                i.startsWith("https://ping.pub")
+            )
+            .slice(0, 8);
+          return {
+            name: k,
+            hdpath: v.hdpath,
+            logos,
+          };
+        });
+      }
     });
   },
 };
