@@ -10,7 +10,7 @@
           alt="Ping KMS"
         />
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Welcome to <br />Ping Key Manager
+          Welcome to <br />Ping Wallet Signer
         </h2>
         <p
           class="mt-2 text-center text-sm font-medium text-red-600 hover:text-red-500"

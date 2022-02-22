@@ -45,8 +45,8 @@ class PingSigner {
           return;
         }
 
-        if (result.error) {
-          reject(new Error(result.error));
+        if (result.body && result.body.error) {
+          reject(new Error(result.body.error));
           return;
         }
 

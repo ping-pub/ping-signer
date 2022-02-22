@@ -81,7 +81,6 @@ export async function writeStore(data) {
 
 export async function removeStore(key) {
   return new Promise(function (resolve) {
-    console.log("removing");
     chrome.storage.local.remove([key], resolve);
   });
 }

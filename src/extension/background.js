@@ -2,7 +2,7 @@
 let sessionkey = "";
 
 chrome.runtime.onMessage.addListener((msg, _, responseCall) => {
-  console.log("background:", msg);
+  // console.log("background:", msg);
   switch (msg.event) {
     case "GetSessionKey":
       responseCall(sessionkey);
@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener((msg, _, responseCall) => {
     }
     default: {
       sendMessageToContent(msg);
-      console.log("no handler");
+      // console.log("no handler");
       responseCall();
     }
   }
@@ -43,11 +43,11 @@ function openWindow() {
       url: chrome.runtime.getURL(`index.html#sign`),
       type: "popup",
     },
-    (win) => {
-      console.log(win);
-      onRemoved.addListener((a) => {
-        sendMessageToContent({ msg: "hello remove", a });
-      });
+    () => {
+      // console.log(win);
+      // onRemoved.addListener((a) => {
+      //   sendMessageToContent({ msg: "hello remove", a });
+      // });
     }
   );
 }

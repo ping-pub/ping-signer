@@ -1,18 +1,21 @@
 {
-  "name": "Ping Key Manager",
+  "name": "Ping Wallet Signer",
   "manifest_version": 3,
-  "version": "0.1",
+  "version": "0.1.1",
   "description": "Ping Wallet is a well-known wallet in Cosmos Ecosystem",
   "permissions": [
-    "tabs",
-    "activeTab",
-    "scripting",
     "storage"
   ],
   "action": {
-    "default_title": "Ping Key Manager",
-    "default_icon": "logo.png",
+    "default_title": "Ping Wallet Signer",
+    "default_icon": "/logo.png",
     "default_popup": "index.html/#/"
+  },
+  "icons": {
+    "16": "/logo.png",
+    "32": "/logo.png",
+    "48": "/logo.png",
+    "128": "/logo.png"
   },
   "background": {
     "service_worker": "background.js",
