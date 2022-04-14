@@ -91,7 +91,9 @@ export default {
         if (chain) {
           a2.logo = chain.logo;
           const hd2 = stringToPath(
-            `m/44'/${chain.coin_type}'/0'/0/0`
+            chain.coin_type === "60"
+              ? `m/44'/${chain.coin_type}'/0'/0`
+              : `m/44'/${chain.coin_type}'/0'/0/0`
           )[1].toNumber();
           a2.compatible = hd2 === coin_type;
         } else {
@@ -130,7 +132,6 @@ export default {
       this.hdpath = acc.hdpath;
       this.selected = acc.addresses.map((x) => x.name);
       this.mnemonic = aesDecrypt(acc.mnemonic, this.sessionkey);
-      console.log("hdpath:", this.hdpath);
       const wallet = this.$store.state.chains.map((x) =>
         createAccounts(this.mnemonic, this.hdpath, x.addr_prefix, x.chain_name)
       );

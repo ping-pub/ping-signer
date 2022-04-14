@@ -156,7 +156,17 @@
         class="text-sm font-medium text-gray-700 flex flex-row place-content-between"
       >
         <span>HD Path</span>
-        <span @click="showChains()"></span>
+        <span>
+          <span
+            class="hover:text-blue-400 text-blue-600"
+            @click="HDPath('eth')"
+          >
+            ETH
+          </span>
+          <span class="hover:text-blue-400 text-blue-600" @click="HDPath()">
+            Cosmos
+          </span>
+        </span>
       </label>
       <div class="mt-1">
         <input
@@ -240,6 +250,13 @@ export default {
     },
   },
   methods: {
+    HDPath(style = "cosmos") {
+      if (style === "eth") {
+        this.hdpath = "m/44'/60'/0'/0";
+      } else {
+        this.hdpath = "m/44'/118'/0'/0/0";
+      }
+    },
     onchange() {
       this.mnemonic = this.mnemonic.trim();
       if ([12, 18, 24].includes(this.words.length))
